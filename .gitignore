@@ -1,0 +1,50 @@
+# Django
+*.pyc
+__pycache__
+*.db
+*.sqlite3
+/staticfiles/
+/media/
+/env/
+/venv/
+virtualenv/
+
+# Frontend (React/Vue.js)
+/node_modules/
+/npm-debug.log*
+/yarn-debug.log*
+/yarn-error.log*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.DS_Store
+/build/
+/dist/
+/out/
+/*.log
+
+# Docker
+*.swp
+*.swo
+*.swn
+.dockerignore
+docker-compose.override.yml
+.env
+/wait-for-db.sh
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.tmp
+*.log
+*.bak
