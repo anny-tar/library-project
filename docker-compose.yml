@@ -24,18 +24,23 @@ services:
     networks:
       - library-network
 
+
   frontend:
-    build: ./frontend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    ports:
-      - "3000:80"
-    environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-    networks:
-      - library-network
+      build:
+        context: ./frontend
+        target: dev # Указываем стадию сборки для разработки
+      volumes:
+        - ./frontend:/app
+        - /app/node_modules # Важно! Избегаем конфликтов с node_modules на хосте
+      ports:
+        - "3000:3000" # Пробрасываем порт dev-сервера
+      environment:
+        - NODE_ENV=development
+        - CHOKIDAR_USEPOLLING=true # Для работы hot-reload в Docker
+        - WATCHPACK_POLLING=true # Дополнительная опция для файлового вотчера
+      networks:
+        - library-network
+      command: npm start # Запускаем dev-сервер
 
 volumes:
   postgres_data:

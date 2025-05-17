@@ -1,3 +1,12 @@
+# Стадия для разработки
+FROM node:18-alpine as dev
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+# Стадия для продакшена
 FROM node:18-alpine as builder
 
 WORKDIR /app
