@@ -30,9 +30,10 @@ services:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
     networks:
       - library-network
 
