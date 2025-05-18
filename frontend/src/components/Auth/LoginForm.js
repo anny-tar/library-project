@@ -1,118 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  TextField,
-  Button,
-  Container,
-  Typography,
-  Box,
-  CircularProgress
-} from '@mui/material';
+import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import { loginUser } from '../../utils/api';
 
 const LoginForm = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
+  const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Автоматический редирект для авторизованных пользователей
-  useEffect(() => {
-    if (localStorage.getItem('access_token')) {
-      navigate('/', { replace: true }); // Блокировка возврата на страницу входа
-    }
-  }, [navigate]);
-
-  // Обработчик изменений в полях формы
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    setError('');
-  };
-
-  // Отправка формы
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-
     try {
       const { data } = await loginUser(formData);
 
-      // Сохранение токенов
+      // Сохраняем токены
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
 
-      // Принудительное обновление навигации
-      window.dispatchEvent(new CustomEvent('auth-change'));
+      // Обновляем интерфейс
+      window.dispatchEvent(new Event('auth-change'));
 
-      // Перенаправление с заменой истории
+      // Редирект с очисткой истории
       navigate('/', { replace: true });
 
-    } catch (error) {
-      let errorMessage = 'Ошибка сервера';
-      if (error.response) {
-        errorMessage = error.response.data.detail || 'Неверные учетные данные';
-      }
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      setError('Неверные имя пользователя или пароль');
     }
   };
 
   return (
     <Container maxWidth="xs">
-      <Box sx={{ mt: 8 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Вход в систему
-        </Typography>
-
+      <Box sx={{ mt: 8, textAlign: 'center' }}>
+        <Typography variant="h4">Вход</Typography>
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
             margin="normal"
             label="Имя пользователя"
-            name="username"
-            variant="outlined"
             value={formData.username}
-            onChange={handleInputChange}
-            disabled={isLoading}
-            autoComplete="username"
+            onChange={(e) => setFormData({...formData, username: e.target.value})}
+            required
           />
-
           <TextField
             fullWidth
             margin="normal"
             label="Пароль"
             type="password"
-            name="password"
-            variant="outlined"
             value={formData.password}
-            onChange={handleInputChange}
-            disabled={isLoading}
-            autoComplete="current-password"
+            onChange={(e) => setFormData({...formData, password: e.target.value})}
+            required
           />
-
-          {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
-              {error}
-            </Typography>
-          )}
-
+          {error && <Typography color="error">{error}</Typography>}
           <Button
+            type="submit"
             fullWidth
             variant="contained"
-            color="primary"
-            type="submit"
             sx={{ mt: 3 }}
-            disabled={isLoading}
-            startIcon={isLoading ? <CircularProgress size={20} /> : null}
           >
-            {isLoading ? 'Вход...' : 'Войти'}
+            Войти
           </Button>
         </form>
       </Box>

@@ -1,43 +1,40 @@
-// frontend/src/components/ProfilePage.js
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, CircularProgress } from '@mui/material';
+import { Container, Typography, CircularProgress, Alert } from '@mui/material';
 import api from '../utils/api';
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    api.get('/users/me/')
-      .then(response => {
-        setUserData(response.data);
+    const fetchData = async () => {
+      try {
+        const { data } = await api.get('users/me/');
+        setUserData(data);
+      } catch (err) {
+        setError('Ошибка загрузки профиля');
+      } finally {
         setLoading(false);
-      })
-      .catch(error => {
-        console.error('Ошибка загрузки:', error);
-        setLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <Container style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-        <CircularProgress />
-      </Container>
-    );
-  }
+  if (loading) return <CircularProgress sx={{ display: 'block', m: '20px auto' }} />;
+  if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom style={{ marginTop: '20px' }}>
-        Личный кабинет
+      <Typography variant="h4" gutterBottom>
+        Профиль пользователя
       </Typography>
-      {userData && (
-        <>
-          <Typography>Имя пользователя: {userData.username}</Typography>
-          <Typography>Email: {userData.email}</Typography>
-          <Typography>Номер читательского билета: {userData.reader.card_number}</Typography>
-        </>
+      <Typography>Имя: {userData.username}</Typography>
+      <Typography>Email: {userData.email || 'не указан'}</Typography>
+      {userData.reader && (
+        <Typography>
+          Читательский билет: {userData.reader.card_number}
+        </Typography>
       )}
     </Container>
   );

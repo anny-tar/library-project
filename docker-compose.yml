@@ -14,8 +14,9 @@ services:
     build: ./backend
     command: bash -c "./wait-for-db.sh && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
+      - ./backend/media:/app/media
       - ./backend:/app
-      - static_volume:/app/staticfiles  # Постоянное хранилище для статики
+      - static_volume:/app/staticfiles
     env_file: .env
     ports:
       - "8000:8000"

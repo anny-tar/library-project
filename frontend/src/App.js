@@ -1,38 +1,50 @@
-// frontend/src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AppBar, Toolbar, Button, Container } from '@mui/material';
 import BookList from './components/BookList';
 import LoginForm from './components/Auth/LoginForm';
 import RegistrationForm from './components/Auth/RegistrationForm';
 import Navigation from './components/Navigation';
 import ProfilePage from './components/ProfilePage';
-import BookDetailPage from './components/BookDetailPage'; // Добавлен импорт
-import Dashboard from './components/Dashboard'; // Убедитесь в правильности импорта
+import BookDetailPage from './components/BookDetailPage';
+import HomePage from './components/HomePage';
 
-// Защищенные маршруты
-const ProtectedRoute = ({ element, ...rest }) => {
+const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
-  return isAuthenticated ? element : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-// Обратные маршруты
-const GuestRoute = ({ element, ...rest }) => {
+const GuestRoute = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem('access_token');
-  return !isAuthenticated ? element : <Navigate to="/" />;
+  return !isAuthenticated ? children : <Navigate to="/" replace />;
 };
 
 const App = () => {
   return (
     <Router>
       <Navigation />
-      <Routes>
-        <Route path="/" element={<Dashboard />} /> {/* Главная страница */}
-        <Route path="/login" element={<GuestRoute element={<LoginForm />} />} />
-        <Route path="/register" element={<GuestRoute element={<RegistrationForm />} />} />
-        <Route path="/profile" element={<ProtectedRoute element={<ProfilePage />} />} />
-        <Route path="/books" element={<BookList />} /> {/* Список книг */}
-        <Route path="/books/:id" element={<BookDetailPage />} />
-      </Routes>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Routes>
+          {/* Главная страница */}
+          <Route path="/" element={<HomePage />} />
+
+          {/* Страница с книгами */}
+          <Route path="/books" element={<BookList />} />
+
+          {/* Авторизация */}
+          <Route path="/login" element={<GuestRoute><LoginForm /></GuestRoute>} />
+
+          {/* Регистрация */}
+          <Route path="/register" element={<GuestRoute><RegistrationForm /></GuestRoute>} />
+
+          {/* Личный кабинет */}
+          <Route
+            path="/profile"
+            element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
+          />
+          <Route path="/books/:id" element={<BookDetailPage />} />
+        </Routes>
+      </Container>
     </Router>
   );
 };
